@@ -9,6 +9,7 @@ del_cost = 1
 ins_cost = 1
 sub_cost = 1
 
+
 def get_edit_distance(list_source, list_target):
     n = len(list_source)
     m = len(list_target)
@@ -47,7 +48,7 @@ def backtrace(dist_matrix, n, m):
     curr_value = dist_matrix[n][m].value
 
     while True:
-        if curr_row == 0 or curr_col == 0:
+        if curr_row == 0 and curr_col == 0:
             break
 
         if dist_matrix[curr_row][curr_col].diagonal_arrow:
@@ -58,12 +59,14 @@ def backtrace(dist_matrix, n, m):
                 curr_value = dist_matrix[curr_row][curr_col].value
             else:
                 operations.insert(0, '')
-        elif dist_matrix[curr_row][curr_col].top_arrow:
+        elif dist_matrix[curr_row][curr_col].top_arrow\
+                or (curr_row != 0 and curr_col == 0):
             curr_row -= 1
             operations.insert(0, 'D')
             curr_value = dist_matrix[curr_row][curr_col].value
 
-        elif dist_matrix[curr_row][curr_col].left_arrow:
+        elif dist_matrix[curr_row][curr_col].left_arrow\
+                or (curr_row == 0 and curr_col != 0):
             curr_col -= 1
             operations.insert(0, 'I')
             curr_value = dist_matrix[curr_row][curr_col].value
@@ -71,7 +74,7 @@ def backtrace(dist_matrix, n, m):
 
 
 def print_output(list_source, list_target, dist_matrix, n, m):
-    print_matrix(dist_matrix, n, m)
+    # print_matrix(dist_matrix, n, m)
 
     backtrace_list = backtrace(dist_matrix, n, m)
 
@@ -152,22 +155,19 @@ class MatrixEntry(object):
 
 
 def main():
-    # test_a = ['a', 'c']
-    # test_b = ['a', 's', 'n']
-    # get_edit_distance(test_a, test_b)
+    # for same result as in slp3-chapter2, Figure 2.16 use sub_cost = 2!
+    # book_a = 'intention'
+    # book_b = 'execution'
+    # get_edit_distance(book_a, book_b)
 
-    book_a = 'intention'
-    book_b = 'execution'
-    get_edit_distance(book_a, book_b)
-
-    # testlist1_a = ['This', 'is', 'nice', 'cat', 'food', '.']
-    # testlist1_b = ['this', 'is', 'the', 'nice', 'cat', '.']
-    # get_edit_distance(testlist1_a, testlist1_b)
+    testlist1_a = ['This', 'is', 'nice', 'cat', 'food', '.']
+    testlist1_b = ['this', 'is', 'the', 'nice', 'cat', '.']
+    get_edit_distance(testlist1_a, testlist1_b)
 
     # testlist2_a = ['The', 'cat', 'likes', 'tasty', 'fish', '.']
     # testlist2_b = ['The', 'cat', 'likes', 'fish', 'very', 'much', '.']
     # get_edit_distance(testlist2_a, testlist2_b)
-    #
+
     # testlist3_a = ['I', 'have', 'adopted', 'cute', 'cats', '.']
     # testlist3_b = ['I', 'have', 'many', 'cats', '.']
     # get_edit_distance(testlist3_a, testlist3_b)
