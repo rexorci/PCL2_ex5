@@ -7,10 +7,15 @@
 
 del_cost = 1
 ins_cost = 1
-sub_cost = 1
+sub_cost = 2
 
 
-def get_edit_distance(list_source, list_target):
+def calculate_edit_distance(list_source, list_target):
+    """    
+    :param list_source: list of strings/chars from which the distance is calculated
+    :param list_target: list of strings/chars to which the distance is calculated
+    :return: None
+    """
     n = len(list_source)
     m = len(list_target)
 
@@ -29,12 +34,18 @@ def get_edit_distance(list_source, list_target):
             sub_val = dist_matrix[row - 1][col - 1].value + get_sub_cost(list_source[row - 1], list_target[col - 1])
             ins_val = dist_matrix[row][col - 1].value + ins_cost
 
+            # The matrix contains MatrixEntries, which contain cost plus the origination used for the backtrace
             dist_matrix[row][col].set_value(del_val, sub_val, ins_val)
 
     print_output(list_source, list_target, dist_matrix, n, m)
 
 
 def get_sub_cost(token_source, token_target):
+    """    
+    :param token_source: token of the source list
+    :param token_target: token of the target list
+    :return: int
+    """
     if token_source == token_target:
         return 0
     else:
@@ -42,6 +53,13 @@ def get_sub_cost(token_source, token_target):
 
 
 def backtrace(dist_matrix, n, m):
+    """
+    Walks one of the cheapest paths backward that lead to the minimum cost 
+    :param dist_matrix: distance matrix
+    :param n: length of source list
+    :param m: length of target list
+    :return: List of characters containing one of the following: '', 'D', 'I', 'S'
+    """
     operations = []
     curr_row = n
     curr_col = m
@@ -58,15 +76,16 @@ def backtrace(dist_matrix, n, m):
                 operations.insert(0, 'S')
                 curr_value = dist_matrix[curr_row][curr_col].value
             else:
+                # substitute the same letter has cost = 0
                 operations.insert(0, '')
         elif dist_matrix[curr_row][curr_col].top_arrow\
-                or (curr_row != 0 and curr_col == 0):
+                or (curr_row != 0 and curr_col == 0):  # boundary condition (first column)
             curr_row -= 1
             operations.insert(0, 'D')
             curr_value = dist_matrix[curr_row][curr_col].value
 
         elif dist_matrix[curr_row][curr_col].left_arrow\
-                or (curr_row == 0 and curr_col != 0):
+                or (curr_row == 0 and curr_col != 0):  # boundary condition (first row)
             curr_col -= 1
             operations.insert(0, 'I')
             curr_value = dist_matrix[curr_row][curr_col].value
@@ -74,6 +93,15 @@ def backtrace(dist_matrix, n, m):
 
 
 def print_output(list_source, list_target, dist_matrix, n, m):
+    """
+    Shows (on the console) the minimum modification that have to be done to come from list_source to list_target
+    :param list_source: list of strings/chars from which the distance is calculated
+    :param list_target: list of strings/chars to which the distance is calculated
+    :param dist_matrix: Distance Matrix
+    :param n: length of source list
+    :param m: length of target list
+    :return: None
+    """
     # print_matrix(dist_matrix, n, m)
 
     backtrace_list = backtrace(dist_matrix, n, m)
@@ -87,6 +115,7 @@ def print_output(list_source, list_target, dist_matrix, n, m):
     counter_target = 0
 
     for entry in backtrace_list:
+        # to achieve a nice layout we construct the 4 output lines first
         column_width = 0
         if entry == '' or entry == 'S':
             column_width = max(len(list_source[counter_source]), len(list_target[counter_target])) + 1
@@ -119,6 +148,13 @@ def print_output(list_source, list_target, dist_matrix, n, m):
 
 
 def print_matrix(dist_matrix, n, m):
+    """    
+    Helper function to visualize the arrows used in the backtrace
+    :param dist_matrix: distance matrix
+    :param n: length of source list
+    :param m: length of target list
+    :return: None
+    """
     for row in range(1, n+1):
         row_string = ''
         for col in range(1, m+1):
@@ -135,19 +171,34 @@ def print_matrix(dist_matrix, n, m):
 
 
 class MatrixEntry(object):
+    """
+    Object used for representation of the cell content of the matrix. Arrows point to possible directions for 
+    a backtrace.
+    """
 
     value = 0
-    left_arrow = False;
-    diagonal_arrow = False;
-    top_arrow = False;
+    left_arrow = False
+    diagonal_arrow = False
+    top_arrow = False
 
     def __init__(self):
         self.value = 0
 
     def set_init_value(self, init_value):
+        """        
+        :param init_value: cell content value 
+        :return: None 
+        """
         self.value = init_value
 
     def set_value(self, del_val, sub_val, ins_val):
+        """        
+        :param del_val: cost if delete is executed in this step
+        :param sub_val: cost if substitution is executed in this step
+        :param ins_val:  cost if insert is executed in this step
+        :return: None
+        """
+        # all the directions with the minimum value are possible directions for a backtrace
         self.value = min(del_val, sub_val, ins_val)
         self.top_arrow = self.value == del_val
         self.diagonal_arrow = self.value == sub_val
@@ -158,19 +209,19 @@ def main():
     # for same result as in slp3-chapter2, Figure 2.16 use sub_cost = 2!
     # book_a = 'intention'
     # book_b = 'execution'
-    # get_edit_distance(book_a, book_b)
+    # calculate_edit_distance(book_a, book_b)
 
     testlist1_a = ['This', 'is', 'nice', 'cat', 'food', '.']
     testlist1_b = ['this', 'is', 'the', 'nice', 'cat', '.']
-    get_edit_distance(testlist1_a, testlist1_b)
+    calculate_edit_distance(testlist1_a, testlist1_b)
 
     # testlist2_a = ['The', 'cat', 'likes', 'tasty', 'fish', '.']
     # testlist2_b = ['The', 'cat', 'likes', 'fish', 'very', 'much', '.']
-    # get_edit_distance(testlist2_a, testlist2_b)
+    # calculate_edit_distance(testlist2_a, testlist2_b)
 
     # testlist3_a = ['I', 'have', 'adopted', 'cute', 'cats', '.']
     # testlist3_b = ['I', 'have', 'many', 'cats', '.']
-    # get_edit_distance(testlist3_a, testlist3_b)
+    # calculate_edit_distance(testlist3_a, testlist3_b)
 
 if __name__ == '__main__':
     main()
