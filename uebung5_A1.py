@@ -7,7 +7,7 @@
 
 del_cost = 1
 ins_cost = 1
-sub_cost = 2
+sub_cost = 1
 
 
 def calculate_edit_distance(list_source, list_target):
@@ -206,11 +206,6 @@ class MatrixEntry(object):
 
 
 def main():
-    # for same result as in slp3-chapter2, Figure 2.16 use sub_cost = 2!
-    # book_a = 'intention'
-    # book_b = 'execution'
-    # calculate_edit_distance(book_a, book_b)
-
     testlist1_a = ['This', 'is', 'nice', 'cat', 'food', '.']
     testlist1_b = ['this', 'is', 'the', 'nice', 'cat', '.']
     calculate_edit_distance(testlist1_a, testlist1_b)
