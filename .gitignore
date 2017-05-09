@@ -163,3 +163,10 @@ ENV/
 /site
 
 # End of https://www.gitignore.io/api/python,pycharm
+*.xml
+
+*.iml
+
+*.xml
+
+.idea/vcs.xml
