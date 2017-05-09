@@ -10,15 +10,8 @@ import random
 import itertools
 
 from collections import defaultdict
-from nltk.metrics import *
 from nltk.classify import NaiveBayesClassifier, accuracy
 from pandas import *
-
-class Vividict(defaultdict):
-
-    def __getitem__(self, key):
-        value = self[key] = type(self)(lambda: 0)
-        return value
 
 class NaiveBayesClassifierNameGenderPrediction:
     """This class implements the naive bayes classification on gender 
@@ -50,8 +43,12 @@ class NaiveBayesClassifierNameGenderPrediction:
             confusion_matrix[label][classifier.classify(feature_set)] += 1
 
         df = DataFrame(confusion_matrix)
+        df.add_prefix("a ")
         print(df)
+        print("_________________________________")
+        print("")
 
+        #could generealize for any classes easily, ain't no body got time fo dat
         male_precision = confusion_matrix["male"]["male"] / (confusion_matrix["male"]["male"] + confusion_matrix["female"]["male"])
         male_recall = confusion_matrix["male"]["male"] / (confusion_matrix["male"]["male"] + confusion_matrix["male"]["female"])
         male_accuracy = (confusion_matrix["male"]["male"] + confusion_matrix["female"]["female"]) / (confusion_matrix["male"]["male"] + confusion_matrix["female"]["female"] + confusion_matrix["male"]["female"] + confusion_matrix["female"]["male"])
@@ -62,14 +59,12 @@ class NaiveBayesClassifierNameGenderPrediction:
         print("male accuracy: ", male_accuracy)
         print("male f-measure: ", male_f_measure)
 
-        female_precision = confusion_matrix["female"]["female"] / (
-            confusion_matrix["female"]["female"] + confusion_matrix["male"]["female"])
-        female_recall = confusion_matrix["female"]["female"] / (
-            confusion_matrix["female"]["female"] + confusion_matrix["female"]["male"])
-        female_accuracy = (confusion_matrix["female"]["female"] + confusion_matrix["male"]["male"]) / (
-            confusion_matrix["female"]["female"] + confusion_matrix["male"]["male"] + confusion_matrix["female"][
-                "male"] +
-            confusion_matrix["male"]["female"])
+        print("_________________________________")
+        print("")
+
+        female_precision = confusion_matrix["female"]["female"] / (confusion_matrix["female"]["female"] + confusion_matrix["male"]["female"])
+        female_recall = confusion_matrix["female"]["female"] / (confusion_matrix["female"]["female"] + confusion_matrix["female"]["male"])
+        female_accuracy = (confusion_matrix["female"]["female"] + confusion_matrix["male"]["male"]) / (confusion_matrix["female"]["female"] + confusion_matrix["male"]["male"] + confusion_matrix["female"]["male"] + confusion_matrix["male"]["female"])
         female_f_measure = 2 * (female_precision * female_recall) / (female_precision + female_recall)
 
         print("female precison: ", female_precision)
@@ -77,19 +72,23 @@ class NaiveBayesClassifierNameGenderPrediction:
         print("female accuracy: ", female_accuracy)
         print("female f-measure: ", female_f_measure)
 
+        print("_________________________________")
+        print("")
+
     @staticmethod
     def gender_features(name):
         """Return a dictionary with all features to identify the gender of
         a name"""
-        return {
-            'ends_with_a': True if name.endswith('a') else False,
-            'ends_with_o': True if name.endswith('o') else False,
-            #'first_char': name[0],
-            'ends_with_consonant': True if name.endswith(r"([bcdfghjklmnpqrstvwxz])") else False,
-            #'length': len(name),
-            'contains_w': True if "w" in name.lower() else False,
+        gender_features = {}
+        c = 0
+        for x in name:
+            gender_features["letter_{}".format(c)] = name[c].lower()
+            c += 1
 
-        }
+        gender_features["f1"] = ord(name[-1]) - ord('a') + 1
+        gender_features["f2"] = ord(name[-2]) - ord('a') + 1
+
+        return gender_features
         # TODO: Add further features to maximise the classifier's performance.
 
     def get_training_and_test_labeled_features(self, female_training_data,

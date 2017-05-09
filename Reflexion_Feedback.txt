@@ -1,5 +1,7 @@
 Reflexion:
 Wir haben den Umgang mit dynamischer Programmierung gelernt, die bei z.B. Optimierungsaufgaben sehr grosse Perfomancegewinne bringen kann.
+Aufgabe 2 war sehr spannend. Wir haben gelern, dass bei supervisiertem maschinellem lernen gute features wichtig sind und
+dass diese teilweise nicht trivial zu finden sind.
 
 Zeitaufwand:
-Die ganze Übung benötigte einen Zeitaufwand von 5 Stunden.
+Die ganze Ãœbung benÃ¶tigte einen Zeitaufwand von 10 Stunden.
