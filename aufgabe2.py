@@ -6,7 +6,6 @@
 """This module uses a naive bayes classifier to identify the gender of names"""
 
 import random
-import collections
 
 import itertools
 
@@ -48,10 +47,35 @@ class NaiveBayesClassifierNameGenderPrediction:
 
         confusion_matrix = defaultdict(lambda : defaultdict(lambda: 0))
         for feature_set, label in test_set:
-            confusion_matrix["actually " + label]["classified as " +classifier.classify(feature_set)] += 1
+            confusion_matrix[label][classifier.classify(feature_set)] += 1
 
-        df = DataFrame(confusion_matrix).T.fillna(0)
+        df = DataFrame(confusion_matrix)
         print(df)
+
+        male_precision = confusion_matrix["male"]["male"] / (confusion_matrix["male"]["male"] + confusion_matrix["female"]["male"])
+        male_recall = confusion_matrix["male"]["male"] / (confusion_matrix["male"]["male"] + confusion_matrix["male"]["female"])
+        male_accuracy = (confusion_matrix["male"]["male"] + confusion_matrix["female"]["female"]) / (confusion_matrix["male"]["male"] + confusion_matrix["female"]["female"] + confusion_matrix["male"]["female"] + confusion_matrix["female"]["male"])
+        male_f_measure = 2 * (male_precision * male_recall)/(male_precision + male_recall)
+
+        print("male precison: ", male_precision)
+        print("male recall: ", male_recall)
+        print("male accuracy: ", male_accuracy)
+        print("male f-measure: ", male_f_measure)
+
+        female_precision = confusion_matrix["female"]["female"] / (
+            confusion_matrix["female"]["female"] + confusion_matrix["male"]["female"])
+        female_recall = confusion_matrix["female"]["female"] / (
+            confusion_matrix["female"]["female"] + confusion_matrix["female"]["male"])
+        female_accuracy = (confusion_matrix["female"]["female"] + confusion_matrix["male"]["male"]) / (
+            confusion_matrix["female"]["female"] + confusion_matrix["male"]["male"] + confusion_matrix["female"][
+                "male"] +
+            confusion_matrix["male"]["female"])
+        female_f_measure = 2 * (female_precision * female_recall) / (female_precision + female_recall)
+
+        print("female precison: ", female_precision)
+        print("female recall: ", female_recall)
+        print("female accuracy: ", female_accuracy)
+        print("female f-measure: ", female_f_measure)
 
     @staticmethod
     def gender_features(name):
@@ -59,9 +83,10 @@ class NaiveBayesClassifierNameGenderPrediction:
         a name"""
         return {
             'ends_with_a': True if name.endswith('a') else False,
-            'first_char': name[0],
-            'ends_with_consonant_vocal': True if name.endswith(r"([bcdfghjklmnpqrstvwxz][aeiou])") else False,
-            'length': len(name),
+            'ends_with_o': True if name.endswith('o') else False,
+            #'first_char': name[0],
+            'ends_with_consonant': True if name.endswith(r"([bcdfghjklmnpqrstvwxz])") else False,
+            #'length': len(name),
             'contains_w': True if "w" in name.lower() else False,
 
         }
